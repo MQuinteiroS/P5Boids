@@ -1,6 +1,6 @@
 class Boid{
-    constructor(){
-        this.position = createVector(random(0, width), random(0, height));
+    constructor(constwidth, constheight){
+        this.position = createVector(constwidth, constheight);
         this.velocity = p5.Vector.random2D();
         this.acceleration = createVector();
         this.maxForce = 0.1;
@@ -39,11 +39,22 @@ class Boid{
         let cornerSides = createVector(5, 5);
         let frontSide = createVector(10, 10);
         // strokeWeight(10);
-        let corner1 = p5.Vector.add(this.position, cornerSides);
-        let corner2 = p5.Vector.sub(this.position, cornerSides);
-        let front = p5.Vector.add(this.position, frontSide);
-        stroke(255);
-        triangle(corner1.x, corner1.y, corner2.x, corner2.y, front.x, front.y)
+        let direction = p5.Vector.normalize(this.velocity)
+        let cornerLeft = p5.Vector.rotate(direction, PI / 2)
+        let cornerRight = p5.Vector.rotate(direction, - PI / 2)
+        direction.mult(15)
+        direction.add(this.position)
+        cornerRight.mult(5)
+        cornerRight.add(this.position)
+        cornerLeft.mult(5)
+        cornerLeft.add(this.position)
+        // let corner1 = p5.Vector.add(this.position, cornerSides);
+        // let corner2 = p5.Vector.sub(this.position, cornerSides);
+        // let front = p5.Vector.add(this.position, frontSide);
+        stroke(209);
+        fill(195, 195, 195, 63)
+        // line(this.position.x, this.position.y, direction.x, direction.y)
+        triangle(cornerLeft.x, cornerLeft.y, cornerRight.x, cornerRight.y, direction.x, direction.y)
         // point(this.position.x, this.position.y);
     }
 
@@ -62,6 +73,7 @@ class Boid{
                 if (distance <= visibility){
                     let diff = p5.Vector.sub(this.position, other.position);
                     diff.normalize();
+                    distance = (distance == 0) ? 0.00001  : distance;
                     diff.div(distance);
                     separate.add(diff)
                     quantity++;

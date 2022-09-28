@@ -2,8 +2,8 @@ let boids = []
 
 function setup() {
     createCanvas(800, 500);
-    for (let i = 0; i < 150; i++){
-        boids.push(new Boid());
+    for (let i = 0; i < 50; i++){
+        boids.push(new Boid(width/2,height/2));
     }
 }
 
@@ -14,4 +14,8 @@ function draw() {
         boid.update(oldBoids);
         boid.show();
     }
+}
+
+function mouseDragged(){
+    boids.push(new Boid(mouseX, mouseY));
 }
