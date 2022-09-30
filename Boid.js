@@ -4,26 +4,32 @@ class Boid{
         this.velocity = p5.Vector.random2D();
         this.acceleration = createVector();
         this.maxForce = 0.1;
-        this.maxSpeed = 5;
+        this.maxSpeed = 4;
     }
 
-    update(boids){
+    update(boids, test){
         this.acceleration = createVector();
-        let sep = this.separate(boids);
-        let ali = this.align(boids);
-        let coh = this.cohesion(boids);
-        sep.mult(1.0);
-        ali.mult(1.0);
-        coh.mult(1.0);
-    
-        this.acceleration.add(sep);
-        this.acceleration.add(ali);
-        this.acceleration.add(coh);
+        if (boids.length > 0){
+            let forces = this.separate(boids, test);
+            // let sep = this.separate(boids);
+            // let ali = this.align(boids);
+            // let coh = this.cohesion(boids);
+            let sep = forces[0];
+            let ali = forces[1];
+            let coh = forces[2];
+            sep.mult(1.07);
+            ali.mult(1.25);
+            coh.mult(0.95);
+        
+            this.acceleration.add(sep);
+            this.acceleration.add(ali);
+            this.acceleration.add(coh);
+        }
         this.velocity.add(this.acceleration);
         this.position.add(this.velocity);
     }
 
-    show(){
+    show(color){
         if(this.position.x > width){
             this.position.x = 0;
         }
@@ -36,32 +42,31 @@ class Boid{
         else if(this.position.y < 0){
             this.position.y = height;
         }
-        let cornerSides = createVector(5, 5);
-        let frontSide = createVector(10, 10);
-        // strokeWeight(10);
         let direction = p5.Vector.normalize(this.velocity)
-        let cornerLeft = p5.Vector.rotate(direction, PI / 2)
-        let cornerRight = p5.Vector.rotate(direction, - PI / 2)
-        direction.mult(15)
+        let cornerLeft = p5.Vector.rotate(direction, PI * 3/ 2)
+        let cornerRight = p5.Vector.rotate(direction, - PI * 3/ 2)
+        direction.mult(6)
         direction.add(this.position)
-        cornerRight.mult(5)
+        cornerRight.mult(2)
         cornerRight.add(this.position)
-        cornerLeft.mult(5)
+        cornerLeft.mult(2)
         cornerLeft.add(this.position)
-        // let corner1 = p5.Vector.add(this.position, cornerSides);
-        // let corner2 = p5.Vector.sub(this.position, cornerSides);
-        // let front = p5.Vector.add(this.position, frontSide);
-        stroke(209);
+        
+        strokeWeight(3);
+        stroke(color);
         fill(195, 195, 195, 63)
-        // line(this.position.x, this.position.y, direction.x, direction.y)
         triangle(cornerLeft.x, cornerLeft.y, cornerRight.x, cornerRight.y, direction.x, direction.y)
-        // point(this.position.x, this.position.y);
     }
 
-    separate(flock){
-        let visibility = 50;
+    separate(flock, test){
+        let vision = 60;
         let separate = createVector();
-        let quantity = 0;
+        let align = createVector();
+        let cohesion = createVector();
+        let quantitysep = 0;
+        if (test){
+            // console.log(flock.length);
+        }
         for (let other of flock){
             if(other != this){
                 let distance = dist(
@@ -70,46 +75,50 @@ class Boid{
                     other.position.x,
                     other.position.y
                 )
-                if (distance <= visibility){
+                if (distance < vision){
+                    cohesion.add(other.position)
+                    align.add(other.velocity)
                     let diff = p5.Vector.sub(this.position, other.position);
                     diff.normalize();
                     distance = (distance == 0) ? 0.00001  : distance;
-                    diff.div(distance);
+                    diff.div(distance * 5);
                     separate.add(diff)
-                    quantity++;
+                    quantitysep++;
                 }
             }
         }
-        if (quantity > 0){
-            separate.div(quantity);
+        if (quantitysep > 0){
+            separate.div(quantitysep);
             separate.normalize();
             separate.mult(this.maxSpeed);
             separate.sub(this.velocity);
             separate.limit(this.maxForce);
+            align.div(quantitysep);
+            align.normalize();
+            align.mult(this.maxSpeed);
+            align.sub(this.velocity);
+            align.limit(this.maxForce);
+            cohesion.div(quantitysep);
+            cohesion.sub(this.position);
+            cohesion.normalize();
+            cohesion.mult(this.maxSpeed);
+            cohesion.sub(this.velocity);
+            cohesion.limit(this.maxForce);
         }
-        return separate;
+        return [separate, align, cohesion];
     }
 
     align(flock){
-        let visibility = 100;
         let align = createVector();
-        let quantity = 0;
+        let quantityalg = 0;
         for (let other of flock){
             if(other != this){
-                let distance = dist(
-                    this.position.x,
-                    this.position.y,
-                    other.position.x,
-                    other.position.y
-                )
-                if (distance <= visibility){
-                    align.add(other.velocity)
-                    quantity++;
-                }
+                align.add(other.velocity)
+                quantityalg++;
             }
         }
-        if (quantity > 0){
-            align.div(quantity);
+        if (quantityalg > 0){
+            align.div(quantityalg);
             align.normalize();
             align.mult(this.maxSpeed);
             align.sub(this.velocity);
@@ -119,25 +128,16 @@ class Boid{
     }
 
     cohesion(flock){
-        let visibility = 60;
         let cohesion = createVector();
-        let quantity = 0;
+        let quantitych = 0;
         for (let other of flock){
             if(other != this){
-                let distance = dist(
-                    this.position.x,
-                    this.position.y,
-                    other.position.x,
-                    other.position.y
-                )
-                if (distance <= visibility){
-                    cohesion.add(other.position)
-                    quantity++;
-                }
+                cohesion.add(other.position)
+                quantitych++;
             }
         }
-        if (quantity > 0){
-            cohesion.div(quantity);
+        if (quantitych > 0){
+            cohesion.div(quantitych);
             cohesion.sub(this.position);
             cohesion.normalize();
             cohesion.mult(this.maxSpeed);
