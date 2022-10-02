@@ -64,9 +64,6 @@ class Boid{
         let align = createVector();
         let cohesion = createVector();
         let quantitysep = 0;
-        if (test){
-            // console.log(flock.length);
-        }
         for (let other of flock){
             if(other != this){
                 let distance = dist(
