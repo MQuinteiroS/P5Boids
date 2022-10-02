@@ -42,20 +42,20 @@ class Boid{
         else if(this.position.y < 0){
             this.position.y = height;
         }
-        let direction = p5.Vector.normalize(this.velocity)
-        let cornerLeft = p5.Vector.rotate(direction, PI * 3/ 2)
-        let cornerRight = p5.Vector.rotate(direction, - PI * 3/ 2)
-        direction.mult(6)
-        direction.add(this.position)
-        cornerRight.mult(2)
-        cornerRight.add(this.position)
-        cornerLeft.mult(2)
-        cornerLeft.add(this.position)
+        let direction = p5.Vector.normalize(this.velocity);
+        let cornerLeft = p5.Vector.rotate(direction, PI * 3/ 2);
+        let cornerRight = p5.Vector.rotate(direction, - PI * 3/ 2);
+        direction.mult(6);
+        direction.add(this.position);
+        cornerRight.mult(2);
+        cornerRight.add(this.position);
+        cornerLeft.mult(2);
+        cornerLeft.add(this.position);
         
         strokeWeight(3);
         stroke(color);
-        fill(195, 195, 195, 63)
-        triangle(cornerLeft.x, cornerLeft.y, cornerRight.x, cornerRight.y, direction.x, direction.y)
+        fill(195, 195, 195, 63);
+        triangle(cornerLeft.x, cornerLeft.y, cornerRight.x, cornerRight.y, direction.x, direction.y);
     }
 
     separate(flock, test){
@@ -74,17 +74,17 @@ class Boid{
                     this.position.y,
                     other.position.x,
                     other.position.y
-                )
-                if (distance < vision){
-                    cohesion.add(other.position)
-                    align.add(other.velocity)
+                );
+                // if (distance < vision){
+                    cohesion.add(other.position);
+                    align.add(other.velocity);
                     let diff = p5.Vector.sub(this.position, other.position);
                     diff.normalize();
                     distance = (distance == 0) ? 0.00001  : distance;
                     diff.div(distance * 5);
-                    separate.add(diff)
+                    separate.add(diff);
                     quantitysep++;
-                }
+                // }
             }
         }
         if (quantitysep > 0){
@@ -113,7 +113,7 @@ class Boid{
         let quantityalg = 0;
         for (let other of flock){
             if(other != this){
-                align.add(other.velocity)
+                align.add(other.velocity);
                 quantityalg++;
             }
         }
@@ -132,7 +132,7 @@ class Boid{
         let quantitych = 0;
         for (let other of flock){
             if(other != this){
-                cohesion.add(other.position)
+                cohesion.add(other.position);
                 quantitych++;
             }
         }

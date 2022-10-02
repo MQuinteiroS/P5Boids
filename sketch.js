@@ -1,10 +1,8 @@
 let boids = [];
 let qtree;
 let check;
-
 function setup() {
     createCanvas(1200, 800);
-    
     qtree = new Quadtree(new Rectangle(width / 2, height / 2, width / 2, height/ 2));
 
     for (let i = 0; i < 100; i++){
@@ -52,7 +50,7 @@ function draw() {
 }
 
 function mouseDragged(){
-    let boid = new Boid(mouseX, mouseY)
+    let boid = new Boid(mouseX, mouseY);
     boids.push(boid);
     qtree.insert(boid);
 }
